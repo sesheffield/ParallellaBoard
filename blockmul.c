@@ -34,13 +34,6 @@ int main(int argc, char *argv[])
         // Get the name of processors
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-
-
-
-
-
-
-
         // If master node
         if(rank == 0)
         {
@@ -70,18 +63,9 @@ int main(int argc, char *argv[])
         }
 
         MPI_Datatype blocktypeA;
-     MPI_Datatype blocktype2A;
+        MPI_Datatype blocktype2A;
         MPI_Datatype blocktypeB;
         MPI_Datatype blocktype2B;
-
-
-
-
-
-
-
-
-
 
 
         // Input paramaters to MPI_Type_vector
@@ -212,6 +196,3 @@ int main(int argc, char *argv[])
         MPI_Finalize();
 
 }
-
-
-
