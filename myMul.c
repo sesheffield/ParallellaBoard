@@ -115,3 +115,48 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+
+    for(proc = 0; proc < p; proc++)
+      {
+        if (proc == rank)
+          {
+            printf("Rank: %d\n", rank);
+            if(rank == 0)
+              {
+                printf("Global matrices: \n");
+                printMat(a,ROWS,COLS);
+                printMat(b,ROWS,COLS);
+              }
+//            printf("Local matrix:\n");
+            printf("Local A:\n");
+            printMat(aOut,BLOCKROWS,BLOCKCOLS);
+            printf("Local B:\n");
+            printMat(bOut,BLOCKROWS,BLOCKCOLS);
+          }
+        MPI_Barrier(MPI_COMM_WORLD);
+        for(i = 0; i < BLOCKROWS; i++)
+        {
+                cOut[i] = 0;
+                for(j = 0; j < BLOCKCOLS; j++)
+                {
+                        cOut[i] += aOut[i * BLOCKCOLS + j] * bOut[j];
+                }
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+      }
+
+    MPI_Gatherv(c, BLOCKROWS *  BLOCKCOLS, MPI_INT, cOut, countsC, dispsC, blocktypeA, 0, MPI_COMM_WORLD);     
+
+    printf("Rank: %d\n", rank);
+            if(rank == 0)
+              {
+                printf("Global matrices: \n");
+                printMat(c,ROWS,COLS);
+              }
+ MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Finalize();
+
+
+    return 0;
+}
+
