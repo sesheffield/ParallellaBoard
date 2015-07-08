@@ -3,6 +3,8 @@
 #include <math.h>     // Is needed for fabs()/absolute value of floating point numbers
 #include <mpi.h> 	 // Is needed for MPI parallelization
 
+double pi_serial(int num_iter);
+
 int main(int argc, char *argv[]) {
     int num_sub_intervals = 0;  	// number of sub intervals
     double start_time, end_time, time_diff; // for timeing most computation intese part of the program
@@ -50,8 +52,9 @@ int main(int argc, char *argv[]) {
 
     if(pRank == 0){ //If I am process 0, prints out the results to user.
         // print the result here:
-        printf("computed pi value is = %g (%17.15f)\n\n", pi_tot,pi_tot);
+        printf("computed pi value in parallel is = %g (%17.15f)\n\n", pi_tot,pi_tot);
         printf("M_PI accurate value from math.h is: %17.15f \n\n", M_PI);
+        pi_serial(num_sub_intervals);
         printf("Difference between computed pi and math.h M_PI = %17.15f\n\n",
                fabs(pi_tot - M_PI));
         printf("Time to compute = %g seconds\n\n", time_diff);
@@ -61,3 +64,37 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
+double pi_serial(int num_iter)
+{
+    // The following variables are declared.
+    double pi; // is for the calculated value of pi
+    double rect_width; // is for the width of each rectangle
+    double rect_left; // is for the left-most x-coordinate of each rectangle
+    double rect_height; // is for the height of each rectangle
+    double agg_area; // is for the aggregate area
+    long long int N_Rects;
+    int i; // is for looping over the rectangles
+
+    // The following commands initialize the algorithm.
+    N_Rects = num_iter; // sets the # of rectangles to its default
+    rect_width = 1.0 / N_Rects; // Uses the # of rectangles to calculate the
+                                // width of each rectangle
+
+    // The following commands run the algorithm.
+    agg_area = 0.0; // initializes the aggregate area
+    rect_left = 0.0; // starts things off at the origin
+    for (i=0; i<N_Rects; i++) { // begins a loop over each rectangle
+        rect_left += rect_width; // finds the next rectangle's left-side x-coord
+        rect_height = sqrt(1-rect_left*rect_left); // calculates the rectangle's
+                                                   // height
+        agg_area += rect_width*rect_height; // calculates the rectangle's area
+                                            // and adds it to the aggregate
+                                            // area.
+    }
+    pi = 4*agg_area; // calculates the final value of pi
+
+    printf("Computed pi value in serial is: %.12f\n", pi); // prints the final value of pi to 12 decimal places,
+                           // an arbitrary amount
+
+    return pi; 
+}

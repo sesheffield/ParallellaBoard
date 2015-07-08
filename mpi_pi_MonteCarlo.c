@@ -5,6 +5,22 @@
 #include <mpi.h>     // Is needed for MPI parallelization
 #define SEED 35791246
 
+double pi_serial(int num_iteration)
+{
+  double pi = 0.0;
+  double x,y,z;
+  int count = 0;
+  int i;
+  for(i=0; i<=num_iteration; i++){
+      x = (double)random()/RAND_MAX; //get a random x coordinate
+      y = (double)random()/RAND_MAX; //get a random y coordinate
+      z = (x*x) + (y*y); 			   //Check to see if number is inside unit circle
+      if (z <=1) count++; 		   //if it is, consider it a valid random point
+  }
+  pi=((double)count/(double)num_iteration)*4.0;  //p = 4(m/n)
+  return pi;
+}
+
 int main (int argc, char **argv){
     double start_time, end_time, time_diff;
     int num_iteration = 0;
@@ -54,11 +70,13 @@ int main (int argc, char **argv){
     //End recording the time here.
     end_time = MPI_Wtime();
     time_diff = end_time - start_time;
+    double serial_pi = pi_serial(num_iteration);
 
     if (pRank == 0){ // If I am process 0, then print  out the messages
 
         printf("Number of iterations is = %d \n\n", num_iteration);
-        printf("Estimated value of PI is %g - (%17.15f)\n\n",pi,pi);
+        printf("Estimated value of PI in parallel is %g - (%17.15f)\n\n",pi,pi);
+        printf("Estimated value of PI in serial is %g - (%17.15f)\n\n",serial_pi,serial_pi);
         printf("Accurate value of PI from math.h is: %17.15f \n\n", M_PI);
 
         printf("Difference between computed pi and math.h M_PI = %17.15f\n\n",
